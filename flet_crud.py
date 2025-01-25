@@ -13,7 +13,6 @@ def create_table():
     cursor.execute(
         """CREATE TABLE IF NOT EXISTS costumers (id INTEGER PRIMARY KEY
         AUTOINCREMENT, name TEXT)
-        
         """
     )
     
@@ -37,19 +36,43 @@ def main(page: ft.Page):
             [field_add_data.content.controls[0].value]
         )
         connection.commit()
-        
-    def show_data(e):
+        show_column.controls.clear()
+        page.update()
+        show_data()
+    
+    
+    show_column = ft.Column(
+        scroll = ft.ScrollMode.ALWAYS,
+        expand = True,
+        alignment=ft.MainAxisAlignment.START,        
+    )
+    
+    def show_data():
         cursor.execute("SELECT * FROM costumers")
         rows = cursor.fetchall()
-        # print(rows)
         for row in rows:
-            page.add(ft.Text(f"ID: {row[0]}, Name: {row[1]}"))
+            show_column.controls.append(ft.ListTile(
+                trailing=ft.IconButton(
+                    icon=ft.Icons.DELETE,
+                    icon_color=ft.Colors.RED,
+                    # on_click=lambda e: remove_data(row[0]),
+                ),
+                shape=ft.RoundedRectangleBorder(radius=10),
+                bgcolor_activated=ft.Colors.BLUE_300,
+                leading=ft.Icon(
+                    name=ft.Icons.PERSON,
+                    color=ft.Colors.WHITE30,
+                    size=45,
+                ),
+                bgcolor=ft.Colors.BLACK45,
+                title=ft.Text("ID: " + str(row[0])),
+                title_text_style=ft.TextStyle(size=8, color=ft.Colors.BLUE_300),
+                subtitle=ft.Text("Name: " + row[1]),
+                subtitle_text_style=ft.TextStyle(size=15, color=ft.Colors.BLUE_300),
+                )
+            )
         page.update()
     
-    # def show_data(e):
-    #     page.add(ft.Text(field_add_data.content.controls[0].value))
-    #     field_add_data.content.controls[0].value = ""
-    #     page.update()
     
     main_title = ft.Container(
         content=ft.Row(
@@ -68,7 +91,7 @@ def main(page: ft.Page):
                 ),    
             ],
         ),
-        margin=5,
+        margin=0,
         padding=5,
         alignment=ft.alignment.center,
         bgcolor=ft.Colors.WHITE12,
@@ -103,7 +126,7 @@ def main(page: ft.Page):
                 ),
             ],
         ),
-        margin=5,
+        margin=0,
         padding=5,
         alignment=ft.alignment.center,
         bgcolor=ft.Colors.WHITE12,
@@ -112,18 +135,22 @@ def main(page: ft.Page):
         border_radius=10,
     )
     
-    show_button = ft.Button(text="Show data", on_click=show_data)
+    
+    
+    # remove_button = ft.Button(text="remove", on_click=remove_elm)
+    show_data()
     
     page.add(
         # teste,
         # teste_txt,
         main_title,
         field_add_data,
-        show_button,
+        # remove_button,
+        show_column,
     )
     
     
-    page.update()
+    # page.update()
 
 
 
