@@ -137,6 +137,8 @@ def main(page: ft.Page):
     page.window.height=600
     page.window.width=300
     page.window.min_width=300
+    page.window.left = 1235  # set the horizontal position of the window
+    page.window.top = 10   # set the vertical position of the window
     # page.horizontal_alignment = "CENTER"
     # page.vertical_alignment = "CENTER"
     # def on_resized(e):
@@ -166,7 +168,7 @@ def main(page: ft.Page):
                         ft.PopupMenuItem(
                             icon=ft.Icons.DELETE,
                             text="Delete",
-                            on_click=popup_delete_alert_open,
+                            on_click=delete_item,
                         ),
                         ft.PopupMenuItem(
                             icon=ft.Icons.EDIT,
@@ -177,10 +179,12 @@ def main(page: ft.Page):
             )
         )
     
+    
     def show_all_data():
         rows = get_all_table()
         for row in rows:
             listTile_items(row)
+    
     
     def add_data(e):
         data = field_add_data.content.controls[0].value
@@ -188,16 +192,27 @@ def main(page: ft.Page):
             insert_data(data) # insert data in database
             field_add_data.content.controls[0].value = "" # clear field after insert data
             listTile_items([get_id_by_name(data), data]) # insert data in list
-            popup_add_data_close(e)
+            field_add_data.parent.open = False
+            page.update()
+        else:
+            field_add_data.content.controls[0].focus() # get focus in field
+            field_add_data.content.controls[0].value = "" # clear field after insert only spaces
+            page.update()
     
-    def popup_add_data_open(e):
-        e.control.page.overlay.append(popup_add_data)
-        popup_add_data.open = True
-        e.control.page.update()
+    
+    def popup_add_data(e):
+        popup_add=ft.AlertDialog(
+            modal=True,
+            title=ft.Text("Insert a new data", size=12),
+            content=field_add_data,
+            actions=[
+                ft.TextButton("Insert", on_click=add_data),#lambda e: add_data(e, popup_add)),            
+                ft.TextButton("Cancel", on_click=lambda e: page.close(popup_add)),
+            ]
+        )
+        page.open(popup_add)
+        page.update()
 
-    def popup_add_data_close(e): 
-        popup_add_data.open = False
-        e.control.page.update()
 
     def delete_item(e):
         item_name=e.control.parent.parent.subtitle.value[6:]
@@ -210,9 +225,9 @@ def main(page: ft.Page):
         popup_delete_alert.open = True
         e.control.page.update()
     
-    def popup_delete_alert_close(e): 
-        popup_delete_alert.open = False
-        e.control.page.update()
+    # def popup_delete_alert_close(e): 
+    #     popup_delete_alert.open = False
+    #     e.control.page.update()
 
     main_title = ft.Container(
         content=ft.Row(
@@ -223,7 +238,6 @@ def main(page: ft.Page):
                     value="CRUD COM SQLITE",
                     size=16,
                     color=ft.Colors.BLUE_300,
-                    # bgcolor=ft.Colors.WHITE12,
                     weight=ft.FontWeight.W_500,
                 ),    
                 ft.IconButton(
@@ -231,7 +245,7 @@ def main(page: ft.Page):
                     icon_color=ft.Colors.BLUE_300,
                     alignment=ft.alignment.center,
                     padding=0,
-                    on_click=popup_add_data_open,
+                    on_click=popup_add_data,
                     
                 )
             ],
@@ -277,35 +291,20 @@ def main(page: ft.Page):
         border_radius=10,
     )
     
-    
-    popup_add_data=ft.AlertDialog(
-        modal=True,
-        title=ft.Text("Insert a new data", size=12),
-        content=field_add_data,
-        actions=[
-            ft.TextButton("Insert", on_click=add_data),            
-            ft.TextButton("Cancel", on_click=popup_add_data_close),
-        ]
-    )
-    
     popup_delete_alert=ft.AlertDialog(
         modal=True,
         title=ft.Text("Delete", size=12),
         content=ft.Text("Are you sure you want to delete this item?"),
         actions=[
             ft.TextButton("Yes", on_click=delete_item),
-            ft.TextButton("No", on_click=popup_delete_alert_close),
+            ft.TextButton("No", on_click= lambda e: page.close(popup_delete_alert)),
         ]
     )
     
     show_all_data()
     
     page.add(
-        # teste,
-        # teste_txt,
         main_title,
-        # field_add_data,
-        # remove_button,
         show_column,
     )
     
