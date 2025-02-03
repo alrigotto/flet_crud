@@ -6,5 +6,7 @@ dist/
 wheels/
 *.egg-info
 
+flet_test.py
+
 # Virtual environments
 .venv
