@@ -135,8 +135,8 @@ def main(page: ft.Page):
     page.window.height=600
     page.window.width=300
     page.window.min_width=300
-    page.window.left = 1235  # set the horizontal position of the window
-    page.window.top = 10   # set the vertical position of the window
+    page.window.left=1235  # set the horizontal position of the window
+    page.window.top=10   # set the vertical position of the window
     # page.horizontal_alignment = "CENTER"
     # page.vertical_alignment = "CENTER"
     # def on_resized(e):
@@ -193,6 +193,22 @@ def main(page: ft.Page):
         rows = get_all_table()
         for row in rows:
             listTile_items(row)
+
+    
+    def popup_add_data(e):
+        page.on_keyboard_event = None # disable add data shortcut
+        popup_add=ft.AlertDialog(
+            modal=True,
+            title=ft.Text("Insert a new data", size=16),
+            content=field_data,
+            actions=[
+                ft.TextButton("Insert", on_click=add_data),            
+                ft.TextButton("Cancel", on_click=lambda e: popup_close(popup_add)),
+            ]
+        )
+        page.open(popup_add)
+        field_data.content.controls[0].focus()
+        page.update()
     
     
     def add_data(e):
@@ -203,35 +219,15 @@ def main(page: ft.Page):
             listTile_items([get_id_by_name(data), data]) # insert data in list
             field_data.parent.open = False
             page.update()
+            page.on_keyboard_event = ctrl_A_pressed # enable add data shortcut
         else:
             field_data.content.controls[0].focus() # get focus in field
             field_data.content.controls[0].value = "" # clear field after insert only spaces
             page.update()
     
     
-    def popup_add_data(e):
-        popup_add=ft.AlertDialog(
-            modal=True,
-            title=ft.Text("Insert a new data", size=16),
-            content=field_data,
-            actions=[
-                ft.TextButton("Insert", on_click=add_data),            
-                ft.TextButton("Cancel", on_click=lambda e: page.close(popup_add)),
-            ]
-        )
-        page.open(popup_add)
-        field_data.content.controls[0].focus()
-        page.update()
-
-
-    def delete_item(e, item, control):
-        delete_data(item, by_name=True)# delete data from database using name column
-        show_column.controls.remove(control) # remove control from listtile        
-        e.control.parent.open = False # close popup
-        page.update()
-    
-    
     def popup_delete_alert(e):
+        page.on_keyboard_event = None # disable add data shortcut   
         item_name=e.control.parent.parent.subtitle.value[6:]
         control_name=e.control.parent.parent
         popup_delete=ft.AlertDialog(
@@ -240,14 +236,23 @@ def main(page: ft.Page):
             content=ft.Text("Are you sure you want to delete this item?"),
             actions=[
                 ft.TextButton("Yes", on_click=lambda e: delete_item(e, item_name, control_name)),
-                ft.TextButton("No", on_click= lambda e: page.close(popup_delete)),
+                ft.TextButton("No", on_click= lambda e: popup_close(popup_delete)),
             ]
         )
         page.open(popup_delete)
         page.update()
     
     
+    def delete_item(e, item, control):
+        delete_data(item, by_name=True)# delete data from database using name column
+        show_column.controls.remove(control) # remove control from listtile        
+        e.control.parent.open = False # close popup
+        page.on_keyboard_event = ctrl_A_pressed # enable add data shortcut
+        page.update()
+    
+    
     def popup_edit_data(e):
+        page.on_keyboard_event = None # disable add data shortcut
         item_original_name=e.control.parent.parent.subtitle.value[6:]
         item_id=e.control.parent.parent.title.value[4:]
         control_name=e.control.parent.parent
@@ -258,7 +263,7 @@ def main(page: ft.Page):
             content=field_data,
             actions=[
                 ft.TextButton("Save", on_click= lambda e: edit_data(e, item_id, control_name)),
-                ft.TextButton("Cancel", on_click= lambda e: page.close(popup_edit)),
+                ft.TextButton("Cancel", on_click= lambda e: popup_close(popup_edit)),
             ]
         )
         page.open(popup_edit)
@@ -272,12 +277,18 @@ def main(page: ft.Page):
             show_column.controls.remove(control) # remove control from listtile (old name)
             update_data(item_id, new_data) # update data in database
             listTile_items([item_id, new_data]) # insert data in listtile (new name)
-            field_data.parent.open = False
+            field_data.parent.open = False # disable add data shortcut
             page.update()
+            page.on_keyboard_event = ctrl_A_pressed # enable add data shortcut
         else:
             field_data.content.controls[0].focus() # get focus in field
             field_data.content.controls[0].value = "" # clear field after insert only spaces
             page.update()
+    
+    
+    def popup_close(popup):
+        page.close(popup)
+        page.on_keyboard_event = ctrl_A_pressed # enable add data shortcut
     
     
     def ctrl_A_pressed(e: ft.KeyboardEvent): # keyboard shortcut to add data
@@ -285,7 +296,7 @@ def main(page: ft.Page):
             popup_add_data(e)
         page.update()
     
-    page.on_keyboard_event = ctrl_A_pressed
+    page.on_keyboard_event = ctrl_A_pressed # enable add data shortcut
     
     
     main_title = ft.Container(
@@ -349,7 +360,6 @@ def main(page: ft.Page):
         height=50,
         border_radius=10,
     )
-    
     
     
     show_all_data()
