@@ -289,6 +289,7 @@ def main(page: ft.Page):
     def popup_close(popup):
         page.close(popup)
         page.on_keyboard_event = ctrl_A_pressed # enable add data shortcut
+        field_data.content.controls[0].value = ""
     
     
     def ctrl_A_pressed(e: ft.KeyboardEvent): # keyboard shortcut to add data
