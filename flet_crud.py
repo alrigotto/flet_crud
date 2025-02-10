@@ -147,29 +147,26 @@ def main(page: ft.Page):
     def listTile_items(row: list):
         show_column.controls.append(
             ft.ListTile(
-                # width=250,
-                # height=100,
                 shape=ft.RoundedRectangleBorder(radius=10),
-                # bgcolor_activated=ft.Colors.BLUE_300,
-                # title_alignment=ListTileAlignment.THREE_LINE,
-                # is_three_line=True,
-                # title_alignment=ft.CrossAxisAlignment.STRETCH,
+                bgcolor=ft.Colors.BLACK45,
+                content_padding=ft.padding.symmetric(horizontal=5),
+                horizontal_spacing=10,
+                min_vertical_padding=15,
+                title=ft.Text("ID: " + str(row[0])),
+                title_text_style=ft.TextStyle(
+                    size=10,
+                    color=ft.Colors.WHITE70,
+                    ),
+                subtitle=ft.Text("Name: " + row[1]),
+                subtitle_text_style=ft.TextStyle(
+                    size=15,
+                    color=ft.Colors.BLUE_300,
+                    ),
                 leading=ft.Icon(
                     name=ft.Icons.PERSON,
                     color=ft.Colors.WHITE30,
-                    size=30,
+                    size=35,
                 ),
-                bgcolor=ft.Colors.BLACK45,
-                title=ft.Text(
-                    "ID: " + str(row[0]),
-                    color=ft.Colors.WHITE30,
-                    ),
-                title_text_style=ft.TextStyle(
-                    size=10,
-                    color=ft.Colors.BLUE_300,
-                    ),
-                subtitle=ft.Text("Name: " + row[1]),
-                subtitle_text_style=ft.TextStyle(size=15, color=ft.Colors.BLUE_300),
                 trailing= ft.PopupMenuButton(
                     icon_color=ft.Colors.WHITE30,
                     items=[
@@ -289,7 +286,7 @@ def main(page: ft.Page):
     def popup_close(popup):
         page.close(popup)
         page.on_keyboard_event = ctrl_A_pressed # enable add data shortcut
-        field_data.content.controls[0].value = ""
+        field_data.content.controls[0].value = "" # Ensures that the TextField will return empty
     
     
     def ctrl_A_pressed(e: ft.KeyboardEvent): # keyboard shortcut to add data
